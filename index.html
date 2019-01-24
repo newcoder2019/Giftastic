@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Giphy Project</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous">
+  a
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+<script>
+  $(document).ready(function () {
+    var topics = [];
+    function displayAnimal() {
+      var x = $(this).data("search");
+      console.log(x);
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + x + "&api_key=dc6zaTOxFJmzC&limit=10";
+      console.log(queryURL);
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).done(function (response) {
+        var results = response.data;
+        console.log(results);
+        for (var i = 0; i < results.length; i++) {
+
+          var showDiv = $("<div class='col-md-4'>");
+          var rating = results[i].rating;
+          var defaultAnimatedSrc = results[i].images.fixed_height.url;
+          var staticSrc = results[i].images.fixed_height_still.url;
+          var showImage = $("<img>");
+          var p = $("<p>").text("Rating: " + rating);
+          showImage.attr("src", staticSrc);
+          showImage.addClass("animalGiphy");
+          showImage.attr("data-state", "still");
+          showImage.attr("data-still", staticSrc);
+          showImage.attr("data-animate", defaultAnimatedSrc);
+          showDiv.append(p);
+          showDiv.append(showImage);
+          $("#gifArea").prepend(showDiv);
+        }
+      });
+    }
+    $("#addShow").on("click", function (event) {
+      event.preventDefault();
+      var newShow = $("#animalInput").val().trim();
+      topics.push(newShow);
+      console.log(topics);
+      $("#animalInput").val('');
+      displayButtons();
+    });
+    function displayButtons() {
+      $("#myButtons").empty();
+      for (var i = 0; i < topics.length; i++) {
+        var a = $('<button class="btn btn-primary">');
+        a.attr("id", "show");
+        a.attr("data-search", topics[i]);
+        a.text(topics[i]);
+        $("#myButtons").append(a);
+      }
+    }
+    displayButtons();
+    $(document).on("click", "#show", displayAnimal);
+    $(document).on("click", ".animalGiphy", pausePlayGifs);
+    function pausePlayGifs() {
+      var state = $(this).attr("data-state");
+      if (state === "still") {
+        $(this).attr("src", $(this).attr("data-animate"));
+        $(this).attr("data-state", "animate");
+      } else {
+        $(this).attr("src", $(this).attr("data-still"));
+        $(this).attr("data-state", "still");
+      }
+    }
+  });
+</script>
+
+
+<body>
+  <div class="container">
+    <div class="jumbotron" style="background-color: black">
+      <h1 class="text-center" style="color: whitesmoke"><strong>Animal Gif Search</strong></h1>
+    </div>
+
+    <form class="form-inline" id="animalSearch">
+      <div class="form-group">
+        <label for="animalInput">
+          <h2 style="color: teal;">Search For Animal Gifs</h2>
+        </label>
+        <input type="text" id="animalInput">
+      </div>
+
+      <input id="addShow" type="submit" value="submit">
+    </form>
+
+    <br>
+
+    <div class="row">
+      <div class="container">
+
+        <button type="button" class="btn btn-info" id="show" data-search="Turtle">Turtle</button>
+        <button type="button" class="btn btn-info" id="show" data-search="Rabbit">Rabbit</button>
+        <button type="button" class="btn btn-info" id="show" data-search="Raccoon">Raccoon</button>
+        <button type="button" class="btn btn-info" id="show" data-search="Cat">Cat</button>
+        <button type="button" class="btn btn-info" id="show" data-search="Bird">Bird</button>
+
+        <div id="myButtons"></div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="container">
+      <span>
+        <div id="gifArea"></div>
+      </span>
+    </div>
+  </div>
+
+</body>
+
+</html>
